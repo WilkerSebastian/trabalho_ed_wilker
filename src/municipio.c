@@ -33,3 +33,19 @@ void printMunicipio(const Municipio *municipio) {
     printf("\n");
 
 }
+
+/* desaloca o municipio da memoria */
+void destroyMunicipio(Municipio *municipio) {
+
+    if (municipio == NULL)
+        return;
+
+    if (municipio->nome != NULL)
+        free(municipio->nome);
+    
+    if (municipio != NULL)
+        free(municipio->fuso_horario);
+
+    free(municipio);
+
+}

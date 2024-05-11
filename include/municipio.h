@@ -21,3 +21,5 @@ typedef struct {
 Municipio *createMunicipioFromJson(const json_t *object);
 
 void printMunicipio(const Municipio *municipio);
+
+void destroyMunicipio(Municipio *municipio);
