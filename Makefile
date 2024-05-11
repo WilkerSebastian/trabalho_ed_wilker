@@ -18,8 +18,8 @@ all: $(BIN)/$(EXECUTABLE)
 run: clean all
 	./$(BIN)/$(EXECUTABLE)
 
-$(BIN)/$(EXECUTABLE): $(SRC)/*.c $(SRC)/**/*.c
-	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
+$(BIN)/$(EXECUTABLE): $(SRC)/*.c
+	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) $^ -o $@ $(LIBRARIES)
 
 dependencies:
 	@echo "Baixando Jansson $(JANSSON_VERSION)..."
