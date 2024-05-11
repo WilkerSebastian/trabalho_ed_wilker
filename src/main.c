@@ -2,36 +2,23 @@
 #include <stdlib.h>
 #include <jansson.h>
 
+#include "file.h"
+
 int main() {
 
-    FILE *arquivo = fopen("municipios.min.json", "r");
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo municipios.json\n");
+    char * jsonString = readFile("municipios.min.json");
+
+    if (jsonString == NULL) {
+        printf("Ocooreu um erro ao ler o municipios.min.json\n");
         return EXIT_FAILURE;
     }
 
-    fseek(arquivo, 0, SEEK_END);
-    size_t tamanho = ftell(arquivo);
-    rewind(arquivo);
-
-    char *conteudo = (char *)malloc(tamanho + 1);
-    fread(conteudo, sizeof(char), tamanho, arquivo);
-    conteudo[tamanho] = '\0';
-
-    fclose(arquivo);
-
-    json_error_t erro;
-    json_t *root = json_loads(conteudo, 0, &erro);
-    free(conteudo); 
+    json_error_t error;
+    json_t *root = json_loads(jsonString, 0, &error);
+    free(jsonString); 
 
     if (root == NULL) {
-        printf("Erro ao fazer o parse do JSON: %s\n", erro.text);
-        return EXIT_FAILURE;
-    }
-
-    if (!json_is_array(root)) {
-        printf("O JSON não é um array\n");
-        json_decref(root);
+        printf("Erro ao fazer o parse do JSON: %s\n", error.text);
         return EXIT_FAILURE;
     }
 
