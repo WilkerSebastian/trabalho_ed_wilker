@@ -8,8 +8,8 @@ typedef struct {
     
     uint32_t codigo_ibge;
     char *nome;
-    float latitude;
-    float longitude;
+    double latitude;
+    double longitude;
     bool capital;
     uint8_t codigo_uf;
     uint16_t siafi_id;

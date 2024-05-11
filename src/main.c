@@ -4,15 +4,19 @@
 
 #include "file.h"
 #include "municipio.h"
+#include "hash_table.h"
 #include "ui.h"
 
 int main() {
 
     uint32_t operation;
+    uint32_t size_json;
     json_error_t error;
-    json_t *root;
+    json_t *root = NULL;
+    Municipio **municipios = NULL;
+    Hashtable *hashTableMunicipios = NULL;
 
-    char * jsonString = readFile("municipios.min.json");
+    char *jsonString = readFile("municipios.min.json");
 
     if (jsonString == NULL) {
         printf("Ocooreu um erro ao ler o municipios.min.json\n");
@@ -27,6 +31,29 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    size_json = json_array_size(root);
+
+    municipios = calloc(size_json, sizeof(Municipio*));
+
+    for (size_t i = 0; i < size_json; i++) {
+
+        json_t *json = json_array_get(root, i);
+
+        *(municipios + i) = createMunicipioFromJson(json);
+
+    }
+
+    json_decref(root);
+
+    hashTableMunicipios = createHashTableMunicipio(municipios, size_json, size_json);
+
+    if (hashTableMunicipios == NULL) {
+
+        printf("Erro ao criar tabela hash dos municipios!\n");
+        return EXIT_FAILURE;
+
+    }
+    
     do {
         
         printf("\n\n");
@@ -47,6 +74,17 @@ int main() {
 
                 }
 
+                Municipio *municipio = getValueByKey(hashTableMunicipios, (uint32_t)codigo_ibge);
+
+                if (municipio == NULL) {
+
+                    printf("Você informou um código IBGE de uma cidade que não existe na tabela!");
+                    break;
+
+                }
+
+                printMunicipio(municipio);
+
                 break;
             
             case UI_ERROR:
@@ -57,7 +95,7 @@ int main() {
 
     } while (operation != UI_EXIT);
 
-    json_decref(root);
+    destroyHashTable(hashTableMunicipios);
     
     return EXIT_SUCCESS;
 }

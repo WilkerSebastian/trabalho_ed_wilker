@@ -1,18 +1,25 @@
 #include "municipio.h"
 
+#include <string.h>
+
 /* Aloca um municipio e passa os valores do json para municipio, retorna o endereço do municipio alocado */
 Municipio *createMunicipioFromJson(const json_t *object) {
 
     Municipio *municipio = (Municipio*)malloc(sizeof(Municipio));
 
     municipio->codigo_ibge = (uint32_t)json_integer_value(json_object_get(object, "codigo_ibge"));
-    municipio->nome = (char*)json_string_value(json_object_get(object, "nome"));
-    municipio->latitude = (float)json_real_value(json_object_get(object, "latitude"));
-    municipio->longitude = (float)json_real_value(json_object_get(object, "longitude"));
+    municipio->latitude = json_real_value(json_object_get(object, "latitude"));
+    municipio->longitude = json_real_value(json_object_get(object, "longitude"));
     municipio->capital = (uint8_t)json_integer_value(json_object_get(object, "capital"));
+    municipio->codigo_uf = (uint8_t)json_integer_value(json_object_get(object, "codigo_uf"));
     municipio->siafi_id = (uint16_t)json_integer_value(json_object_get(object, "siafi_id"));
     municipio->ddd = (uint8_t)json_integer_value(json_object_get(object, "ddd"));
-    municipio->fuso_horario = (char*)json_string_value(json_object_get(object, "fuso_horario"));
+
+    municipio->nome = (char*)malloc(json_string_length(json_object_get(object, "nome")) + 1);
+    municipio->fuso_horario = (char*)malloc(json_string_length(json_object_get(object, "fuso_horario")) + 1);
+
+    strcpy(municipio->nome, json_string_value(json_object_get(object, "nome")));
+    strcpy(municipio->fuso_horario, json_string_value(json_object_get(object, "fuso_horario")));
 
     return municipio;
 
