@@ -61,14 +61,6 @@ uint8_t setKeyValue(Hashtable *hashTable, uint32_t key, Municipio* value) {
 
     } 
 
-    if ((*(hashTable->table + index))->key == key) {
-
-        (*(hashTable->table + index))->value = value;
-
-        return HASH_OK;
-
-    }
-
     uint64_t hash2 = hashSDBM(key);
     uint32_t iterations = 0;
 
@@ -96,9 +88,7 @@ uint8_t setKeyValue(Hashtable *hashTable, uint32_t key, Municipio* value) {
 
     }
 
-    (*(hashTable->table + index))->value = value;
-
-    return HASH_OK;
+    return HASH_ERROR;
 
 }
 
@@ -122,6 +112,12 @@ Municipio *getValueByKey(Hashtable *hashTable, uint32_t key) {
     
     if (*(hashTable->table + index) != NULL && (*(hashTable->table + index))->key == key) 
         return ((*(hashTable->table + index))->value);
+
+    // caso tudo dei errado fazer busca linear, sim é uma gambiarra de ultima hora desculpa
+
+    for (size_t i = 0; i < hashTable->length; i++)
+        if ((*(hashTable->table + i))->key == key)
+            return (*(hashTable->table + i))->value;
     
     return NULL; 
 
