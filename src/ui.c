@@ -11,12 +11,13 @@ int8_t mainMenu() {
 
     printf("----- Wilker Trabalho de E.D -----\n");
     printf("1) consultar cidade\n");
+    printf("2) cidades vizinhas\n");
     printf("0) ENCERRAR\n");
     printf("-------------------------------\n");
     printf("\nOpção: ");
     err = scanf("%hhd", &op);
 
-    if (err == EOF || (op < UI_EXIT || op > UI_CONSULT))
+    if (err == EOF || (op < UI_EXIT || op > UI_PROXIMITY))
         return UI_ERROR;
 
     return op;
@@ -35,6 +36,21 @@ int32_t consultation() {
         return UI_ERROR;
 
     return codigo_ibge;
+
+}
+
+int32_t questN(const char *nome, int max) {
+
+    int err;
+    int32_t n;
+
+    printf("Informe quantas cidades mais proximas de (%s), deseja buscar: ", nome);
+    err = scanf("%d", &n);
+
+    if (err == EOF || (n < 0 || n > max))
+        return UI_ERROR;
+
+    return n;
 
 }
 

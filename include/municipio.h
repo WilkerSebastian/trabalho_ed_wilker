@@ -23,3 +23,5 @@ Municipio *createMunicipioFromJson(const json_t *object);
 void printMunicipio(const Municipio *municipio);
 
 void destroyMunicipio(Municipio *municipio);
+
+double distanceMunicipios(Municipio *m1, Municipio *m2);

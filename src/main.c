@@ -5,16 +5,27 @@
 #include "file.h"
 #include "municipio.h"
 #include "hash_table.h"
+#include "kdtree.h"
 #include "ui.h"
 
 int main() {
 
     uint32_t operation;
     uint32_t size_json;
+
+    int32_t codigo_ibge = 0;
+    int32_t n = 0;
+
     json_error_t error;
     json_t *root = NULL;
+
     Municipio **municipios = NULL;
+    Municipio *municipio = NULL;
+
     Hashtable *hashTableMunicipios = NULL;
+
+    KDnode *kdTreeMunicipios = NULL;
+    KDnode *nearestMunicipios = NULL;
 
     char *jsonString = readFile("municipios.min.json");
 
@@ -53,6 +64,17 @@ int main() {
         return EXIT_FAILURE;
 
     }
+
+    for (size_t i = 0; i < size_json; i++) 
+        kdTreeMunicipios = insertMunicipioInKD(kdTreeMunicipios, *(municipios + i), 0);
+
+    if (kdTreeMunicipios == NULL) {
+
+        printf("Erro ao criar arvore K-D dos municipios!\n");
+        return EXIT_FAILURE;
+
+    }
+
     
     do {
         
@@ -65,7 +87,7 @@ int main() {
 
             case UI_CONSULT:
 
-                int32_t codigo_ibge = consultation();
+                codigo_ibge = consultation();
 
                 if (codigo_ibge == UI_ERROR) {
 
@@ -74,11 +96,11 @@ int main() {
 
                 }
 
-                Municipio *municipio = getValueByKey(hashTableMunicipios, (uint32_t)codigo_ibge);
+                municipio = getValueByKey(hashTableMunicipios, (uint32_t)codigo_ibge);
 
                 if (municipio == NULL) {
 
-                    printf("Você informou um código IBGE de uma cidade que não existe na tabela!");
+                    printf("Você informou um código IBGE de uma cidade que não existe na tabela!\n");
                     break;
 
                 }
@@ -86,7 +108,51 @@ int main() {
                 printMunicipio(municipio);
 
                 break;
+            case UI_PROXIMITY:
+
+                codigo_ibge = consultation();
+
+                if (codigo_ibge == UI_ERROR) {
+
+                    printf("Você informou um código IBGE inválido!\n");
+                    break;
+
+                }
+
+                municipio = getValueByKey(hashTableMunicipios, (uint32_t)codigo_ibge);
+
+                if (municipio == NULL) {
+
+                    printf("Você informou um código IBGE de uma cidade que não existe na tabela!\n");
+                    break;
+
+                }
+
+                n = questN(municipio->nome, size_json - 2);
+
+                if (n == UI_ERROR) {
+
+                    printf("Você informou uma quantidade inválida de municipios!\n");
+                    break;
+
+                }
+
+                nearestMunicipios = NULL;
+
+                findNearestMunicipios(kdTreeMunicipios, municipio, n, &nearestMunicipios);
+
+                if (nearestMunicipios == NULL) {
+
+                    printf("Erro a buscar cidades proximas\n");
+                    break;
+                
+                }
+
+                printKD(nearestMunicipios, 0);
+
+                destroyKDTree(nearestMunicipios);
             
+                break;
             case UI_ERROR:
 
                 printf("Você selecionou uma opção que não existe no menu!");
@@ -96,6 +162,12 @@ int main() {
     } while (operation != UI_EXIT);
 
     destroyHashTable(hashTableMunicipios);
+    destroyKDTree(kdTreeMunicipios);
+
+    for (size_t i = 0;i < size_json;i++)
+        destroyMunicipio(*(municipios + i));
+
+    free(municipio);
     
     return EXIT_SUCCESS;
 }

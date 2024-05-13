@@ -5,7 +5,7 @@ BIN		:= bin
 SRC		:= src
 INCLUDE	:= include
 
-LIBRARIES	:= -ljansson
+LIBRARIES	:= -ljansson -lm
 EXECUTABLE	:= municipios
 
 JANSSON_VERSION := 2.13.1

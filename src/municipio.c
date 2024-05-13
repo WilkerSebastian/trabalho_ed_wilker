@@ -1,6 +1,9 @@
 #include "municipio.h"
 
 #include <string.h>
+#include <math.h>
+
+// Essa foi a unica que deu tempo de documentar minimamente
 
 /* Aloca um municipio e passa os valores do json para municipio, retorna o endereço do municipio alocado */
 Municipio *createMunicipioFromJson(const json_t *object) {
@@ -54,5 +57,13 @@ void destroyMunicipio(Municipio *municipio) {
         free(municipio->fuso_horario);
 
     free(municipio);
+
+}
+
+/* calcula a distancia entre dois municipios */
+double distanceMunicipios(Municipio *m1, Municipio *m2) {
+
+    // disntacia entre dois pontos sqrt( (x2 - x1)² + (y2 - y1)² ) 
+    return sqrt(pow((m2->longitude - m1->longitude), 2) + pow((m2->latitude - m1->latitude), 2));
 
 }
